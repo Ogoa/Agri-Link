@@ -2,4 +2,14 @@
     <string name="app_name">Agri-Link</string>
     <string name="web_client_id" translatable="false">874435031227-r9cb9tdm4ma2ki5ola74btc9g0icvk6q.apps.googleusercontent.com</string>
 
+    <string name="home">Home</string>
+    <string name="home_icon">Home Icon</string>
+    <string name="add_item">Add Item</string>
+    <string name="add_item_icon">Add item icon</string>
+    <string name="profile">Profile</string>
+    <string name="profile_icon">Profile icon</string>
+    <string name="my_profile">My Profile</string>
+    <string name="account">Account</string>
+    <string name="right_arrow_key">Show details</string>
+
 </resources>
