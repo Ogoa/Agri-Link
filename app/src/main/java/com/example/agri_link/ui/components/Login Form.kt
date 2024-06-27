@@ -1,4 +1,3 @@
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,15 +34,17 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginForm(signInWithGoogle: () -> Unit) {
+fun LoginForm(
+    signInWithGoogle: () -> Unit,
+    signUp: () -> Unit
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val emailReadOnly by remember { mutableStateOf(true) }
-    val passwordReadOnly by remember { mutableStateOf(true) }
+    var emailReadOnly by remember { mutableStateOf(false) }
+    var passwordReadOnly by remember { mutableStateOf(false) }
 
     var passwordVisible by remember { mutableStateOf(false) }
-
 
     /// investigate ToDo
     Surface(
@@ -69,6 +70,7 @@ fun LoginForm(signInWithGoogle: () -> Unit) {
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
+            // Email Text Field
             OutlinedTextField(
                 value = email,
                 label = {
@@ -165,6 +167,9 @@ fun LoginForm(signInWithGoogle: () -> Unit) {
 
                 Button(
                     onClick = {
+                        emailReadOnly = true
+                        passwordReadOnly = true
+
                         signInWithGoogle()
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -188,7 +193,7 @@ fun LoginForm(signInWithGoogle: () -> Unit) {
                 }
 
                 TextButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { signUp() },
                     modifier = Modifier
                         .padding(top = 16.dp)
                 ) {

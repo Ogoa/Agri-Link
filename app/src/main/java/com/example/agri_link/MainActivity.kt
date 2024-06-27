@@ -1,38 +1,7 @@
-/*
-
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.agri_link.ui.theme.AgriLinkTheme
-
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            AgriLinkTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
-            }
-        }
-    }
-}
-
-*/
 package com.example.agri_link
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -47,15 +16,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.agri_link.sign_in.GoogleAuthUiClient
-import com.example.agri_link.ui.ProfileScreen
-import com.example.agri_link.ui.SignInScreen
+import com.example.agri_link.firebaseFunctions.createUserDocumentIfNotExists
+import com.example.agri_link.google_functions.GoogleAuthUiClient
+import com.example.agri_link.ui.screens.FeedScreen
+import com.example.agri_link.ui.screens.NewAccountDetails
+import com.example.agri_link.ui.screens.PostProduct
+import com.example.agri_link.ui.screens.ProfileScreen
+import com.example.agri_link.ui.screens.SignInScreen
+import com.example.agri_link.ui.view_models.FeedViewModel
 import com.example.agri_link.ui.view_models.SignInViewModel
 import com.google.android.gms.auth.api.identity.Identity
-
+import com.google.android.libraries.places.api.Places
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
+// entry point of the application
 class MainActivity : ComponentActivity() {
+
+    // Google Auth Client
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
             context = applicationContext,
@@ -64,87 +42,175 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
+        // Define variables to hold the Places and Maps API keys.
+        if (true) {
+            val apiKey = BuildConfig.PLACES_API_KEY
+
+            // Log an error if apiKey is not set.
+            if (apiKey.isEmpty()) {
+                Log.e("Places test", "No api key")
+                finish()
+                return
+            } else {
+                Log.d("Places test", "API key: $apiKey")
+            }
+
+            // Initialize the SDK
+            Places.initializeWithNewPlacesApiEnabled(applicationContext, apiKey)
+
+            // Create a new Places 653Client instance
+            val placesClient = Places.createClient(this)
+
+            Log.d("Places test", "Places Client: $placesClient")
+
+            ////////////// Maps
+
+            val mapsApiKey = BuildConfig.MAPS_API_KEY
+
+            if (mapsApiKey.isEmpty()) {
+                Log.e("Maps test", "No api key")
+                finish()
+                return
+            } else {
+                Log.d("Maps test", "API key: $mapsApiKey")
+            }
+        }
+
+
         setContent {
+            // used to navigate between different screens
             val navController = rememberNavController()
 
-            NavHost(
-                navController = navController,
-                startDestination = "sign_in"
-            ) {
-                composable("sign_in") {
-                    val viewModel = viewModel<SignInViewModel>()
-                    val state by viewModel.state.collectAsStateWithLifecycle()
+            val showNavHost = true
 
-                    // checking if a user is already signed in
-                        // if already signed in, navigate to profile screen
-                    LaunchedEffect(key1 = Unit) {
-                        if (googleAuthUiClient.getSignedInUser() != null) {
-                            navController.navigate("profile")
+            if (showNavHost) {
+                // holds all the destinations/screens
+                NavHost(
+                    navController = navController,
+                    startDestination = "sign_in"
+                ) {
+                    composable("sign_in") {
+                        val viewModel = viewModel<SignInViewModel>()
+                        val state by viewModel.state.collectAsStateWithLifecycle()
+
+                        // checks if a user is signed in at app launch
+                        LaunchedEffect(key1 = Unit) {
+                            if (googleAuthUiClient.getSignedInUser() != null) {
+                                // if a user is already signed in, navigate to another screen
+                                navController.navigate("profile")
+                            }
                         }
-                    }
 
-                    val launcher = rememberLauncherForActivityResult(
-                        contract = ActivityResultContracts.StartIntentSenderForResult(),
-                        onResult = { result ->
-                            if (result.resultCode == RESULT_OK) {
-                                lifecycleScope.launch {
-                                    val signInResult = googleAuthUiClient.signInWithIntent(
-                                        intent = result.data ?: return@launch
-                                    )
-                                    viewModel.onSignInResult(signInResult)
+                        // launch an intent that brings up the Google Sign In Dialog
+                        val launcher = rememberLauncherForActivityResult(
+                            contract = ActivityResultContracts.StartIntentSenderForResult(),
+                            onResult = { result ->
+                                if (result.resultCode == RESULT_OK) {
+                                    lifecycleScope.launch {
+                                        val signInResult = googleAuthUiClient.signInWithIntent(
+                                            intent = result.data ?: return@launch
+                                        )
+                                        viewModel.onSignInResult(signInResult)
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
 
-                    LaunchedEffect(key1 = state.isSignInSuccessful) {
-                        if (state.isSignInSuccessful) {
-                            Toast.makeText(
-                                applicationContext,
-                                "Sign in successful",
-                                Toast.LENGTH_LONG
-                            ).show()
-
-                            navController.navigate("profile")
-                            viewModel.resetState()
-                            //navController.popBackStack()
-                        }
-                    }
-
-                    SignInScreen(
-                        state = state,
-                        googleSignIn = {
-                            lifecycleScope.launch {
-                                val signInIntentSender = googleAuthUiClient.signIn()
-                                launcher.launch(
-                                    IntentSenderRequest.Builder(
-                                        signInIntentSender ?: return@launch
-                                    ).build()
-                                )
-                            }
-                        }
-                    )
-                }
-                composable("profile") {
-                    ProfileScreen(
-                        userData = googleAuthUiClient.getSignedInUser(),
-                        onSignOut = {
-                            lifecycleScope.launch {
-                                googleAuthUiClient.signOut()
+                        // on successful sign in:
+                        LaunchedEffect(key1 = state.isSignInSuccessful) {
+                            if (state.isSignInSuccessful) {
                                 Toast.makeText(
                                     applicationContext,
-                                    "Signed out",
+                                    "Sign in successful",
                                     Toast.LENGTH_LONG
                                 ).show()
 
-                                //navController.navigate("sign_in") //.popBackStack()
-                                navController.popBackStack()
+                                // TODO move to ViewModel
+                                createUserDocumentIfNotExists(FirebaseAuth.getInstance().currentUser!!)
+
+                                navController.navigate("profile")
+                                viewModel.resetState()
                             }
                         }
-                    )
+
+                        SignInScreen(
+                            state = state,
+                            googleSignIn = {
+                                lifecycleScope.launch {
+                                    val signInIntentSender = googleAuthUiClient.signIn()
+                                    launcher.launch(
+                                        IntentSenderRequest.Builder(
+                                            signInIntentSender ?: return@launch
+                                        ).build()
+                                    )
+                                }
+                            },
+                            signUp = {
+                                navController.navigate("sign_up")
+                            }
+                        )
+                    }
+
+                    composable("sign_up") {
+                        NewAccountDetails()
+                    }
+
+                    composable("upload_images") {
+
+                        PostProduct()
+
+                    }
+
+                    composable("feed") {
+                        val viewModel = viewModel<FeedViewModel>()
+                        FeedScreen(viewModel = viewModel)
+                    }
+
+
+                    composable("profile") {
+                        ProfileScreen(
+                            userData = googleAuthUiClient.getSignedInUser(),
+                            uploadImages = {
+                                navController.navigate("upload_images")
+                            },
+                            feed = {
+                                navController.navigate("feed")
+                            },
+                            onSignOut = {
+                                lifecycleScope.launch {
+                                    googleAuthUiClient.signOut()
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Signed out",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                    navController.navigate("sign_in") //.popBackStack()
+                                    //navController.popBackStack()
+                                }
+                            }
+                        )
+                    }
                 }
+            } else {
+                /*// TODO
+                val viewModel = viewModel<NewAccountDetailsViewModel>()
+
+                //NewAccountDetails(viewModel = viewModel)
+
+                AddressAutocomplete(viewModel = viewModel, placesClient = placesClient)*/
+
+
+                //ImageUploadScreen()
+
+                //PickImageFromGallery()
+
+                PostProduct()
+
+
             }
 
 
@@ -152,5 +218,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 

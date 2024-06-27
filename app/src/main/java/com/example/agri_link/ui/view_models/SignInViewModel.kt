@@ -1,7 +1,7 @@
 package com.example.agri_link.ui.view_models
 
-import SignInResult
-import com.example.agri_link.ui.SignInState
+import com.example.agri_link.ui.state.SignInResult
+import com.example.agri_link.ui.state.SignInState
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

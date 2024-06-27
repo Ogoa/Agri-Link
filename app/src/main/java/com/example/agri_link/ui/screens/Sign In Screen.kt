@@ -1,4 +1,4 @@
-package com.example.agri_link.ui
+package com.example.agri_link.ui.screens
 
 import LoginForm
 import android.widget.Toast
@@ -13,14 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.agri_link.ui.state.SignInState
 
 @Composable
 fun SignInScreen(
     state: SignInState,
-    googleSignIn: () -> Unit
+    googleSignIn: () -> Unit,
+    signUp: () -> Unit
 ) {
     val context = LocalContext.current
 
+    // Display a Toast with the Error Message if an error occurs
     LaunchedEffect(key1 = state.signInError) {
         state.signInError?.let { error ->
             Toast.makeText(
@@ -38,12 +41,11 @@ fun SignInScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        LoginForm(signInWithGoogle = googleSignIn)
+        LoginForm(signInWithGoogle = googleSignIn, signUp = signUp)
 
         /*val viewModel = viewModel<NewAccountDetailsViewModel>()
         val State by viewModel.state.collectAsStateWithLifecycle()
-        val fd by viewModel.fieldsDisabled.collectAsStateWithLifecycle()
+        val fd by viewModel.fieldsDisabled.collectAsStateWithLifecycle()*/
 
-        NewAccountDetails(viewModel = viewModel, state = State)*/
     }
 }

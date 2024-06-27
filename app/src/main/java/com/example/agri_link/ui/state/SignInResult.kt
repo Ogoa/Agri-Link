@@ -1,5 +1,4 @@
-
-import com.example.agri_link.ui.UserData
+package com.example.agri_link.ui.state
 
 data class SignInResult(
     val data: UserData?,

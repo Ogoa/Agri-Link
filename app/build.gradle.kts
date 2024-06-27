@@ -7,6 +7,12 @@ plugins {
 
     // Compose Destinations
     id("com.google.devtools.ksp") version "1.9.22-1.0.17"
+
+    // for Parcelization
+    id("kotlin-parcelize")
+
+    // Secrets
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 // Compose Destinations
@@ -56,7 +62,24 @@ android {
     }
     buildFeatures {
         compose = true
+
+        // added for Google Places
+        buildConfig = true
     }
+    secrets {
+        // Optionally specify a different file name containing your secrets.
+        // The plugin defaults to "local.properties"
+        propertiesFileName = "secrets.properties"
+
+        // A properties file containing default secret values. This file can be checked in version control.
+        defaultPropertiesFileName = "local.defaults.properties"
+
+        // Configure which keys should be ignored by the plugin by providing regular expressions.
+        // "sdk.dir" is ignored by default.
+        ignoreList.add("keyToIgnore") // Ignore the key "keyToIgnore"
+        ignoreList.add("sdk.*")       // Ignore all keys matching the regexp "sdk.*"
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.10" // was 1.5.1
     }
@@ -83,9 +106,14 @@ dependencies {
     // Firebase
     implementation(libs.firebase.auth)
     implementation(libs.play.services.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
+
     // Import the Firebase BoM
     implementation(platform(libs.firebase.bom))
 
+    // Accompanist Permissions Library
+    implementation(libs.accompanist.permissions)
 
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
@@ -102,10 +130,12 @@ dependencies {
     // Icons
     implementation(libs.androidx.material.icons.extended)
 
-    // Compose Destinations
-    /*implementation (libs.compose.destinations)
-    ksp (libs.compose.destinations.ksp)*/
+    // Google Places
+    implementation(platform(libs.kotlin.bom))
+    implementation(libs.places)
+    // Google Maps
+    implementation(libs.maps.compose)
+    // Maps SDK for Android
+    implementation (libs.play.services.maps)
 
-    implementation("io.github.raamcosta.compose-destinations:core:1.1.2-beta")
-    ksp("io.github.raamcosta.compose-destinations:ksp:1.1.2-beta")
 }
