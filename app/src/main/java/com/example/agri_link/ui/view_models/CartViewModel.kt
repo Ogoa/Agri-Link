@@ -48,7 +48,7 @@ class CartViewModel : ViewModel() {
         }
     }
 
-    fun checkout() {
+    /*fun checkout() {
         viewModelScope.launch {
             try {
                 // Move items to checkout collection in Firestore
@@ -77,5 +77,5 @@ class CartViewModel : ViewModel() {
                 Log.e("CartViewModel", "Error during checkout", e)
             }
         }
-    }
+    }*/
 }
