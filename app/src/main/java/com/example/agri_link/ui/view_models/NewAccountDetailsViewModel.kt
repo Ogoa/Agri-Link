@@ -2,7 +2,7 @@ package com.example.agri_link.ui.view_models
 
 import android.content.ContentValues.TAG
 import android.util.Log
-import com.example.agri_link.ui.state.UserData
+import com.example.agri_link.ui.state_data_classes.UserData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.maps.model.LatLng

@@ -2,8 +2,8 @@ package com.example.agri_link.ui.view_models
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import com.example.agri_link.firebaseFunctions.uploadImagesToFirebaseStorageAndFirestore
-import com.example.agri_link.ui.state.Product
+import com.example.agri_link.firebase_functions.uploadImagesToFirebaseStorageAndFirestore
+import com.example.agri_link.ui.state_data_classes.Product
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

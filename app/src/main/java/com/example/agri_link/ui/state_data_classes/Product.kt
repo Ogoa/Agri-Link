@@ -1,4 +1,4 @@
-package com.example.agri_link.ui.state
+package com.example.agri_link.ui.state_data_classes
 
 // Leave as is!
 // To match the document in Firestore

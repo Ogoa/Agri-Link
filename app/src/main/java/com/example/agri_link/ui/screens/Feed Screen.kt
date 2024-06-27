@@ -77,6 +77,7 @@ fun FeedScreen(
                 }
             }
 
+            // TODO prevent double adding
             // Add Product to Cart
             Button(
                 onClick = {

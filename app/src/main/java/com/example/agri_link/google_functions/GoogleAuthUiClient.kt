@@ -1,8 +1,8 @@
 package com.example.agri_link.google_functions
 
 
-import com.example.agri_link.ui.state.SignInResult
-import com.example.agri_link.ui.state.UserData
+import com.example.agri_link.ui.state_data_classes.SignInResult
+import com.example.agri_link.ui.state_data_classes.UserData
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender

@@ -1,4 +1,4 @@
-package com.example.agri_link.firebaseFunctions
+package com.example.agri_link.firebase_functions
 
 import android.net.Uri
 import com.google.firebase.Firebase

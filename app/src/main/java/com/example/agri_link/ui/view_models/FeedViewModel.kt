@@ -3,8 +3,9 @@ package com.example.agri_link.ui.view_models
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.agri_link.firebaseFunctions.retrieveFeedPosts
-import com.example.agri_link.ui.state.Product
+import com.example.agri_link.firebase_functions.addToUserCart
+import com.example.agri_link.firebase_functions.retrieveFeedPosts
+import com.example.agri_link.ui.state_data_classes.Product
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -21,20 +22,19 @@ class FeedViewModel : ViewModel() {
         viewModelScope.launch {
             val posts = retrieveFeedPosts()
 
-            Log.d("retrieveFeedPosts", "In ViewModel")
+            Log.d("View Model", "FeedViewModel: retrieveFeedPosts ->In ViewModel")
 
             _posts.value = posts
         }
     }
 
     fun addToCart(post: Product) {
-        viewModelScope.launch {
-            try {
-                //addToUserCart(post)
-                Log.d("addToCart", "Added to cart: ${post.Name}")
-            } catch (e: Exception) {
-                Log.e("addToCart", "Error adding to cart", e)
-            }
+        try {
+            addToUserCart(post)
+
+            Log.d("View Model", "FeedViewModel: addToCart -> Added to cart: ${post.Name}")
+        } catch (e: Exception) {
+            Log.e("View Model", "FeedViewModel: addToCart -> Error adding to cart", e)
         }
     }
 }

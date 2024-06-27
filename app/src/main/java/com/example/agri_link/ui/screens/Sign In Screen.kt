@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.agri_link.ui.state.SignInState
+import com.example.agri_link.ui.state_data_classes.SignInState
 
 @Composable
 fun SignInScreen(

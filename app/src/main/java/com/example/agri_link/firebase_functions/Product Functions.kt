@@ -1,7 +1,7 @@
-package com.example.agri_link.firebaseFunctions
+package com.example.agri_link.firebase_functions
 
 import android.util.Log
-import com.example.agri_link.ui.state.Product
+import com.example.agri_link.ui.state_data_classes.Product
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.firestore
@@ -24,7 +24,6 @@ fun addPostToFirestore(
 
     Log.d("Firebase", "addPostToFirestore: Setting...")
 
-    // TODO make doc ID current date time
     userPosts.document(LocalDateTime.now().toString()).set(
         hashMapOf(
             "Name" to productName,

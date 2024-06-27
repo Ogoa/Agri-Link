@@ -51,7 +51,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import com.example.agri_link.firebaseFunctions.uploadImagesToFirebaseStorageAndFirestore
+import com.example.agri_link.firebase_functions.uploadImagesToFirebaseStorageAndFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

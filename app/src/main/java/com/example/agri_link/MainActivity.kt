@@ -16,13 +16,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.agri_link.firebaseFunctions.createUserDocumentIfNotExists
+import com.example.agri_link.firebase_functions.createUserDocumentIfNotExists
 import com.example.agri_link.google_functions.GoogleAuthUiClient
+import com.example.agri_link.ui.screens.CartScreen
 import com.example.agri_link.ui.screens.FeedScreen
 import com.example.agri_link.ui.screens.NewAccountDetails
 import com.example.agri_link.ui.screens.PostProduct
 import com.example.agri_link.ui.screens.ProfileScreen
 import com.example.agri_link.ui.screens.SignInScreen
+import com.example.agri_link.ui.view_models.CartViewModel
 import com.example.agri_link.ui.view_models.FeedViewModel
 import com.example.agri_link.ui.view_models.SignInViewModel
 import com.google.android.gms.auth.api.identity.Identity
@@ -159,9 +161,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("upload_images") {
-
                         PostProduct()
-
                     }
 
                     composable("feed") {
@@ -169,6 +169,11 @@ class MainActivity : ComponentActivity() {
                         FeedScreen(viewModel = viewModel)
                     }
 
+                    // Cart Screen
+                    composable("cart") {
+                        val viewModel = viewModel<CartViewModel>()
+                        CartScreen(viewModel = viewModel)
+                    }
 
                     composable("profile") {
                         ProfileScreen(
@@ -178,6 +183,9 @@ class MainActivity : ComponentActivity() {
                             },
                             feed = {
                                 navController.navigate("feed")
+                            },
+                            cart = {
+                                navController.navigate("cart")
                             },
                             onSignOut = {
                                 lifecycleScope.launch {
