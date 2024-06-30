@@ -11,6 +11,8 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 
+// ALL UNUSED
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun RequestStoragePermission(

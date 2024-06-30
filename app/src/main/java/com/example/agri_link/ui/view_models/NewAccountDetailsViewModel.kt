@@ -24,27 +24,9 @@ class NewAccountDetailsViewModel : ViewModel() {
     val state = _state.asStateFlow()
 
     val fieldsDisabled = MutableStateFlow(false)
-    //val producerClicked = MutableStateFlow(false)
-
 
     fun disableFields() {
         fieldsDisabled.update { true }
-    }
-
-    fun producerClicked() {
-        _state.update {
-            it.copy(
-                producer = true
-            )
-        }
-    }
-
-    fun customerClicked() {
-        _state.update {
-            it.copy(
-                producer = false
-            )
-        }
     }
 
     fun onFirstNameChanged(firstName: String) {

@@ -9,7 +9,15 @@ import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 import java.util.*
 
-fun addToUserCart(post: Product) {
+// This function is responsible for adding a product to the user's cart.
+// It generates a unique ID for each product added to the cart
+// and stores the product details in the user's cart collection in Firebase Firestore.
+// The product details include the product's name, description, and price.
+/**
+ * Adds a product to the user's cart in Firebase Firestore.
+ * @param post The product to be added to the cart.
+ */
+fun addToUserCart(post: Product, success: () -> Unit) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
     val userDoc = FirebaseFirestore.getInstance().collection("Users").document(userId)
@@ -30,12 +38,19 @@ fun addToUserCart(post: Product) {
     )
         .addOnSuccessListener {
             Log.d("Firebase", "addToUserCart: Cart Document created")
+            success()
         }
         .addOnFailureListener { e ->
             Log.w("Firebase", "addToUserCart: Error creating Cart Document", e)
         }
 }
 
+// retrieves all items in the user's cart from Firebase Firestore.
+// It returns a list of CartItem objects, each representing a product in the user's cart.
+/**
+ * Retrieves all items in the user's cart from Firebase Firestore.
+ * @return A list of CartItem objects, each representing a product in the user's cart.
+ */
 suspend fun retrieveCartItems(): MutableList<CartItem> {
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return mutableListOf()
     val userDoc = FirebaseFirestore.getInstance().collection("Users").document(userId)
@@ -63,25 +78,6 @@ suspend fun retrieveCartItems(): MutableList<CartItem> {
             } else {
                 Log.w("Firebase", "retrieveCartItems: Invalid document: $cartItem.id")
             }
-
-            // Ensure itemData is not null and contains necessary fields
-            /*if (itemData != null) {
-                val itemName = itemData["Name"] as? String ?: ""
-                val itemDescription = itemData["Description"] as? String ?: ""
-                val itemPrice = (itemData["Price"] as? Int) ?: 0
-
-                // Create CartItem object and add to list
-                val cartItem = CartItem(
-                    id = itemId,
-                    name = itemName,
-                    description = itemDescription,
-                    price = itemPrice
-                )
-
-                cartItems.add(cartItem)
-            } else {
-                Log.w("Firestore", "retrieveCartItems: Invalid document: $itemId")
-            }*/
         }
     } catch (e: Exception) {
         Log.e("Firebase", "retrieveCartItems: Error retrieving cart items", e)
@@ -90,6 +86,13 @@ suspend fun retrieveCartItems(): MutableList<CartItem> {
     return cartItems
 }
 
+// removes a specific item from the user's cart in Firebase Firestore.
+// The item to be removed is identified by its ID.
+// If the item is found in the user's cart, it is deleted.
+/**
+ * Removes a specific item from the user's cart in Firebase Firestore.
+ * @param itemId The ID of the item to be removed.
+ */
 suspend fun removeFromUserCart(itemId: String) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
     val userDoc = FirebaseFirestore.getInstance().collection("Users").document(userId)

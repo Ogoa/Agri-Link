@@ -5,9 +5,6 @@ plugins {
     // For Firebase
     id("com.google.gms.google-services")
 
-    // Compose Destinations
-    id("com.google.devtools.ksp") version "1.9.22-1.0.17"
-
     // for Parcelization
     id("kotlin-parcelize")
 

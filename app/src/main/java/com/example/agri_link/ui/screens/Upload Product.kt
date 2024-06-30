@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -32,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.input.ImeAction
@@ -52,21 +56,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.agri_link.firebase_functions.uploadImagesToFirebaseStorageAndFirestore
+import com.example.agri_link.ui.view_models.UploadProductsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Preview
 @Composable
-fun PostProduct() {
+fun PostProduct(viewModel: UploadProductsViewModel) {
     // variables to store entered details
-    var productName by remember { mutableStateOf("") }
-    var productDescription by remember { mutableStateOf("") }
+
     var productPrice by remember { mutableStateOf("") }
     var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
 
     val context = LocalContext.current
     val bitmapsMap = remember { mutableStateMapOf<Uri, Bitmap>() }
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    val state = viewModel.state.collectAsState()
 
     // image picking dialog
     val launcher =
@@ -75,12 +80,7 @@ fun PostProduct() {
         }
 
     Surface(
-        modifier = Modifier
-            .fillMaxWidth(),
-        color = Color(0xFF171717),
-        //contentColor  = Color.White,
-        // shadowElevation = 8.dp,
-        shape = MaterialTheme.shapes.large
+        modifier = Modifier.fillMaxWidth(),
     ) {
         LazyColumn(
             modifier = Modifier
@@ -93,15 +93,13 @@ fun PostProduct() {
                 Text(
                     text = "Enter Product Details",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
-                    modifier = Modifier.padding(vertical = 16.dp)
                 )
             }
 
             item {
                 // Product Name Text Field
                 OutlinedTextField(
-                    value = productName,
+                    value = state.value.Name,
                     label = {
                         Text(text = "Product Name")
                     },
@@ -109,7 +107,7 @@ fun PostProduct() {
                         Text(text = "Enter name of product")
                     },
                     onValueChange = {
-                        productName = it
+                        viewModel.onNameChanged(it)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     //.weight(1f),
@@ -135,7 +133,7 @@ fun PostProduct() {
             item {
                 // Product Description Text Field
                 OutlinedTextField(
-                    value = productDescription,
+                    value = state.value.Description,
                     label = {
                         Text(text = "Description")
                     },
@@ -143,7 +141,7 @@ fun PostProduct() {
                         Text(text = "Describe your product")
                     },
                     onValueChange = {
-                        productDescription = it
+                        viewModel.onDescriptionChanged(it)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     //.weight(1f),
@@ -201,7 +199,14 @@ fun PostProduct() {
             }
 
             item {
-                LazyRow {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            item {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     items(imageUris) { uri ->
                         val bitmap = bitmapsMap[uri]
 
@@ -211,8 +216,9 @@ fun PostProduct() {
                                 bitmap = bitmap.asImageBitmap(),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .padding(20.dp)
-                                    .clip(MaterialTheme.shapes.medium)
+                                    .size(300.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
                             )
                         } else {
                             LaunchedEffect(uri) {
@@ -260,18 +266,8 @@ fun PostProduct() {
             item {
                 Button(
                     onClick = {
-
-
-                        // TODO Move to ViewModel
-
-                        uploadImagesToFirebaseStorageAndFirestore(
+                        viewModel.uploadPost(
                             uris = imageUris,
-                            onFailure = { exception ->
-                                // Handle failed upload
-                                Log.d("Firebase Storage", "Failed: ${exception.message}")
-                            },
-                            productName = productName,
-                            productDescription = productDescription,
                             productPrice = productPrice.toInt()
                         )
                     }) {

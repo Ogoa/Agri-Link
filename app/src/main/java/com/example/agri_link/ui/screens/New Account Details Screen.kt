@@ -102,63 +102,6 @@ fun NewAccountDetails(
             }
 
             item {
-                Text(
-                    text = "Choose account type",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
-
-            item {
-                Row(
-                    modifier = Modifier
-                        .padding(top = 24.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    Button(
-                        onClick = {
-                            viewModel.producerClicked()
-                        },
-                        modifier = Modifier
-                    ) {
-                        Text("Producer")
-
-                        Spacer(modifier = Modifier.width(5.dp))
-
-                        if (state.producer) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null
-                            )
-                        }
-                    }
-
-                    Button(
-                        onClick = {
-                            viewModel.customerClicked()
-                        },
-                        modifier = Modifier
-                    ) {
-                        Text("Customer")
-
-                        Spacer(modifier = Modifier.width(5.dp))
-
-                        if (state.producer.not()) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                }
-            }
-
-
-/////////////////////////////////////////////
-
-            item {
                 Surface(
                     modifier = Modifier
                         .padding(16.dp)

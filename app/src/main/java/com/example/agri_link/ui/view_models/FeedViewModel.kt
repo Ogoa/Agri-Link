@@ -14,6 +14,9 @@ class FeedViewModel : ViewModel() {
     private val _posts = MutableStateFlow<List<Product>>(listOf())
     val posts = _posts.asStateFlow()
 
+    private val _addedToCart = MutableStateFlow(false)
+    val addedToCart = _addedToCart.asStateFlow()
+
     init {
         getPosts()
     }
@@ -30,11 +33,20 @@ class FeedViewModel : ViewModel() {
 
     fun addToCart(post: Product) {
         try {
-            addToUserCart(post)
+            addToUserCart(
+                post, success = {
+                    _addedToCart.value = true
+                }
+            )
 
             Log.d("View Model", "FeedViewModel: addToCart -> Added to cart: ${post.Name}")
         } catch (e: Exception) {
             Log.e("View Model", "FeedViewModel: addToCart -> Error adding to cart", e)
         }
     }
+
+    fun falsifyAddedToCart() {
+        _addedToCart.value = false
+    }
+
 }

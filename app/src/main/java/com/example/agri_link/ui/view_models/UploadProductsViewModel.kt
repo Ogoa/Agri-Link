@@ -12,6 +12,9 @@ class UploadProductsViewModel: ViewModel() {
     private val _state = MutableStateFlow(Product())
     val state = _state.asStateFlow()
 
+    private val _postPosted = MutableStateFlow(false)
+    val postPosted = _postPosted.asStateFlow()
+
     fun onProductUploadResult(product: Product) {
         _state.value = product
     }
@@ -52,21 +55,22 @@ class UploadProductsViewModel: ViewModel() {
 
     fun uploadPost(
         uris: List<Uri>,
-        onFailure: (Exception) -> Unit,
-        productName: String,
-        productDescription: String,
         productPrice: Int
     ){
         uploadImagesToFirebaseStorageAndFirestore(
             uris = uris,
-            onFailure = onFailure,
-            productName = productName,
-            productDescription = productDescription,
-            productPrice = productPrice
+            productName = _state.value.Name,
+            productDescription = _state.value.Description,
+            productPrice = productPrice,
+            onPostSuccess = {
+                _postPosted.value = true
+            },
         )
     }
 
-    //private fun upload
+    fun falsifyPostPosted() {
+        _postPosted.value = false
+    }
 
 
 }

@@ -9,11 +9,24 @@ import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDateTime
 
+// adds a new post to Firebase Firestore.
+// It takes the details of a product and a list of image URLs.
+// It generates a unique ID for the post based on the current date and time,
+// and creates a new document in the "Posts" sub-collection of the user's document in the "Users" collection.
+// The document contains the product details and image URLs.
+/**
+ * Adds a new post to Firebase Firestore with the product details and image URLs.
+ * @param productName The name of the product.
+ * @param productDescription The description of the product.
+ * @param imageURLs The URLs of the images of the product.
+ * @param productPrice The price of the product.
+ */
 fun addPostToFirestore(
     productName: String,
     productDescription: String,
     imageURLs: List<String>,
-    productPrice: Int
+    productPrice: Int,
+    onPostSuccess: () -> Unit
 ) {
     Log.d("Firebase Post To Document", "addPostToFirestore: In Function")
 
@@ -34,15 +47,20 @@ fun addPostToFirestore(
     )
         .addOnSuccessListener {
             Log.d("Firebase", "addPostToFirestore: Post Document created")
+            onPostSuccess()
         }
         .addOnFailureListener { e ->
             Log.w("Firebase", "addPostToFirestore: Error creating Post Document", e)
         }
 }
 
-// This function retrieves documents from the "Users" collection,
-// then retrieves the "Posts" sub-collection for each user document,
-// and finally checks if the documents are valid before adding them to the userPosts list.
+// retrieves all posts from the "Posts" sub-collection of each user document in the "Users" collection in Firebase Firestore.
+// It returns a list of Product objects, each representing a post.
+// The function checks for invalid documents and only adds valid posts to the list.
+/**
+ * Retrieves all posts from the "Posts" sub-collection of each user document in the "Users" collection in Firebase Firestore.
+ * @return A list of Product objects, each representing a post.
+ */
 suspend fun retrieveFeedPosts(): MutableList<Product> {
     val usersCollection = Firebase.firestore.collection("Users")
     val userPosts = mutableListOf<Product>()
